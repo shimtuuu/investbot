@@ -19,9 +19,7 @@ export default function RafflePage() {
         <div className="terminal">
           <div className="terminal-header">session: orbit</div>
           <pre className="terminal-body">
-            <code>$ sudo ./orbit_trading_init
-&gt; Initializing trading system...
-&gt; Connecting to blockc</code>
+            <code>Сервис временно недоступен</code>
           </pre>
         </div>
       </div>
