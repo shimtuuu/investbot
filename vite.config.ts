@@ -6,5 +6,16 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true
+  },
+  base: "./",
+  build: {
+    assetsDir: "",
+    rollupOptions: {
+      output: {
+        entryFileNames: "[name].js",
+        chunkFileNames: "chunk-[hash].js",
+        assetFileNames: "[name][extname]"
+      }
+    }
   }
 });

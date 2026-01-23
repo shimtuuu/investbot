@@ -35,6 +35,7 @@ export const getInitData = () => getWebApp()?.initData ?? "";
 export const prepareWebApp = () => {
   const webApp = getWebApp();
   if (!webApp) return;
+  document.documentElement.classList.add("tg-webapp");
   webApp.ready();
   webApp.expand();
   webApp.setHeaderColor?.("#0a101a");

@@ -32,9 +32,22 @@
   --font-display: "Unbounded", "Manrope", sans-serif;
 }
 
+html {
+  background-color: var(--bg);
+}
+
 body {
   font-family: var(--font-body);
   color: var(--text);
+  background-color: var(--bg);
+  overflow-x: hidden;
+}
+
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background-color: var(--bg);
   background-image:
     radial-gradient(circle at 12% 18%, rgba(74, 209, 255, 0.18), transparent 45%),
@@ -42,13 +55,11 @@ body {
     radial-gradient(circle at 24% 80%, rgba(255, 255, 255, 0.08), transparent 45%),
     radial-gradient(circle at 60% 100%, rgba(18, 40, 85, 0.65), transparent 55%),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
-  position: relative;
-  overflow-x: hidden;
 }
 
-body::before {
+.app-bg::before {
   content: "";
-  position: fixed;
+  position: absolute;
   inset: 0;
   pointer-events: none;
   background-image:
@@ -62,9 +73,9 @@ body::before {
   z-index: 0;
 }
 
-body::after {
+.app-bg::after {
   content: "";
-  position: fixed;
+  position: absolute;
   inset: -20%;
   pointer-events: none;
   background:
@@ -74,12 +85,13 @@ body::after {
   filter: blur(60px);
   opacity: 0.6;
   animation: drift 16s ease-in-out infinite;
-  z-index: 0;
+  z-index: 1;
 }
 
 #root {
   position: relative;
   z-index: 1;
+  min-height: 100%;
 }
 
 h1,

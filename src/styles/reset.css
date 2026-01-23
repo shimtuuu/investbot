@@ -12,8 +12,18 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+html {
+  height: 100%;
+}
+
+body,
+#root {
+  min-height: 100%;
+}
+
 body {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 img,

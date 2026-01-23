@@ -30,11 +30,11 @@
     animation: none;
   }
 
-  body::before {
+  .app-bg::before {
     animation: none;
   }
 
-  body::after {
+  .app-bg::after {
     animation: none;
   }
 }
