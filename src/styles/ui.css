@@ -13,6 +13,50 @@
   z-index: 1;
 }
 
+.app--locked {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.lock-card {
+  max-width: 420px;
+  width: 100%;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  padding: 24px;
+}
+
+.lock-badge {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #1b1208;
+  background: linear-gradient(135deg, #f5a23a, #ffbe6b);
+  box-shadow: 0 10px 22px rgba(245, 162, 58, 0.2);
+}
+
+.lock-title {
+  font-size: 1.4rem;
+}
+
+.lock-sub {
+  color: var(--muted);
+  max-width: 320px;
+}
+
+.lock-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 html.tg-webapp .app {
   max-width: none;
   margin: 0;
@@ -23,6 +67,10 @@ html.tg-webapp .app {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.topbar--center {
+  justify-content: center;
 }
 
 .brand-chip {
@@ -371,15 +419,15 @@ html.tg-webapp .app {
 .btn--primary {
   background: linear-gradient(135deg, #f5a23a, #ffbe6b);
   color: #1b1208;
-  box-shadow: 0 16px 30px rgba(245, 162, 58, 0.3);
+  box-shadow: 0 8px 18px rgba(245, 162, 58, 0.18);
 }
 
 .btn--primary::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, rgba(255, 255, 255, 0.4), transparent 45%);
-  opacity: 0.6;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.25), transparent 45%);
+  opacity: 0.45;
   transform: translateX(-60%);
   transition: transform 0.4s ease;
   pointer-events: none;

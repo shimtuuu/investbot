@@ -32,6 +32,8 @@ export const getTelegramUser = () => getWebApp()?.initDataUnsafe?.user;
 
 export const getInitData = () => getWebApp()?.initData ?? "";
 
+export const isTelegramWebApp = () => Boolean(getWebApp());
+
 export const prepareWebApp = () => {
   const webApp = getWebApp();
   if (!webApp) return;
