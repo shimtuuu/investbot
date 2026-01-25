@@ -26,12 +26,16 @@ export const HomeIcon = ({ size, ...props }: IconProps) => (
 
 export const WalletIcon = ({ size, ...props }: IconProps) => (
   <svg viewBox="0 0 24 24" width={iconSize(size)} height={iconSize(size)} {...props}>
-    <path
-      {...baseProps}
-      d="M4 7.5h14.5a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7.5Z"
-    />
-    <path {...baseProps} d="M4 7.5V6a2 2 0 0 1 2-2h10" />
-    <circle {...baseProps} cx="17.5" cy="14" r="1.5" />
+    {(() => {
+      const walletProps = { ...baseProps, strokeWidth: 2.4 };
+      return (
+        <>
+          <rect {...walletProps} x="3" y="6" width="18" height="14" rx="3.2" />
+          <path {...walletProps} d="M7 10.2h9.4" />
+          <rect x="16.1" y="13.2" width="3.2" height="2" rx="1" fill="currentColor" stroke="none" />
+        </>
+      );
+    })()}
   </svg>
 );
 
@@ -45,10 +49,10 @@ export const BriefcaseIcon = ({ size, ...props }: IconProps) => (
 
 export const UsersIcon = ({ size, ...props }: IconProps) => (
   <svg viewBox="0 0 24 24" width={iconSize(size)} height={iconSize(size)} {...props}>
-    <path {...baseProps} d="M16.5 14a3.5 3.5 0 1 0-3.4-4.4" />
-    <circle {...baseProps} cx="9" cy="9" r="3.5" />
-    <path {...baseProps} d="M2.5 19a6.5 6.5 0 0 1 13 0" />
-    <path {...baseProps} d="M16 19a4.5 4.5 0 0 1 5.5-4.3" />
+    <circle {...baseProps} cx="8" cy="9" r="3" />
+    <circle {...baseProps} cx="16" cy="9" r="3" />
+    <path {...baseProps} d="M3.5 20a4.5 4.5 0 0 1 9 0" />
+    <path {...baseProps} d="M11.5 20a4.5 4.5 0 0 1 9 0" />
   </svg>
 );
 

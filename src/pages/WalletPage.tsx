@@ -1,4 +1,6 @@
 import { CalculatorIcon } from "../components/icons";
+import { requestInput, showMessage } from "../lib/notify";
+import { depositFunds, formatMoney, requestAmount, useWalletState, withdrawFunds } from "../lib/wallet";
 
 const paymentMethods = [
   { label: "Pay", bg: "rgba(60, 211, 107, 0.18)", border: "rgba(60, 211, 107, 0.5)" },
@@ -10,6 +12,54 @@ const paymentMethods = [
 ] as const;
 
 export default function WalletPage() {
+  const { wallet } = useWalletState();
+
+  const handleDeposit = async () => {
+    const amount = await requestAmount("Сумма пополнения");
+    if (!amount) {
+      await showMessage("Ошибка", "Введите корректную сумму.");
+      return;
+    }
+    depositFunds(amount);
+    await showMessage("Готово", `Депозит пополнен на ${formatMoney(amount)}.`);
+  };
+
+  const handleWithdraw = async () => {
+    const amount = await requestAmount("Сумма вывода");
+    if (!amount) {
+      await showMessage("Ошибка", "Введите корректную сумму.");
+      return;
+    }
+    const result = withdrawFunds(amount);
+    if (!result.ok) {
+      await showMessage("Ошибка", result.message);
+      return;
+    }
+    await showMessage("Готово", `Заявка на вывод ${formatMoney(amount)} создана.`);
+  };
+
+  const handleCalculator = async () => {
+    const principal = await requestAmount("Сумма для расчета");
+    if (!principal) {
+      await showMessage("Ошибка", "Введите корректную сумму.");
+      return;
+    }
+    const daysRaw = await requestInput("Срок", "Введите срок в днях", "30");
+    const days = daysRaw ? Number(daysRaw.replace(/[^\d]/g, "")) : 0;
+    if (!Number.isFinite(days) || days <= 0) {
+      await showMessage("Ошибка", "Введите корректное количество дней.");
+      return;
+    }
+    const dailyRate = 0.018;
+    const profit = principal * dailyRate * days;
+    await showMessage(
+      "Расчет дохода",
+      `Сумма: ${formatMoney(principal)}\nСрок: ${days} дн.\nОжидаемая прибыль: ${formatMoney(
+        profit
+      )}`
+    );
+  };
+
   return (
     <section className="page">
       <div className="section-header reveal">
@@ -21,11 +71,15 @@ export default function WalletPage() {
         <div className="wallet-chip">Основной счет</div>
         <div className="wallet-balance">
           <span className="wallet-label">Доступно к выводу</span>
-          <div className="wallet-amount">0,00 ₽</div>
+          <div className="wallet-amount">{formatMoney(wallet.balance)}</div>
         </div>
         <div className="wallet-actions">
-          <button className="btn btn--primary">Пополнить</button>
-          <button className="btn btn--secondary">Вывести</button>
+          <button className="btn btn--primary" onClick={handleDeposit}>
+            Пополнить
+          </button>
+          <button className="btn btn--secondary" onClick={handleWithdraw}>
+            Вывести
+          </button>
         </div>
       </div>
 
@@ -50,7 +104,9 @@ export default function WalletPage() {
           <div className="card-title">Калькулятор</div>
           <div className="muted">Рассчитайте доход по тарифам</div>
         </div>
-        <button className="btn btn--ghost">Открыть</button>
+        <button className="btn btn--ghost" onClick={handleCalculator}>
+          Открыть
+        </button>
       </div>
     </section>
   );

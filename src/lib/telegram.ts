@@ -16,6 +16,17 @@ export type TelegramWebApp = {
   expand: () => void;
   setHeaderColor?: (color: string) => void;
   setBackgroundColor?: (color: string) => void;
+  showAlert?: (message: string, callback?: () => void) => void;
+  showPopup?: (
+    params: {
+      title?: string;
+      message: string;
+      buttons?: { id?: string; type?: "default" | "ok" | "close" | "cancel" | "destructive"; text: string }[];
+    },
+    callback?: (buttonId: string) => void
+  ) => void;
+  openTelegramLink?: (url: string) => void;
+  openLink?: (url: string) => void;
 };
 
 declare global {

@@ -1,6 +1,10 @@
 import { type ReactNode, useEffect, useState } from "react";
 import { brand } from "../../config/brand";
+import { links } from "../../config/links";
+import { openExternal, showConfirm, showMessage } from "../../lib/notify";
+import { depositFunds, formatMoney, requestAmount } from "../../lib/wallet";
 import { getTelegramUser, isTelegramWebApp, prepareWebApp } from "../../lib/telegram";
+import ModalHost from "../overlays/ModalHost";
 import { InfoIcon, PlusIcon } from "../icons";
 import BottomNav from "../navigation/BottomNav";
 
@@ -119,6 +123,22 @@ export default function AppShell({ children }: { children: ReactNode }) {
     );
   }
 
+  const handleHelp = async () => {
+    await showConfirm("Справка", "Открыть поддержку в Telegram?", () =>
+      openExternal(links.bot)
+    );
+  };
+
+  const handleQuickDeposit = async () => {
+    const amount = await requestAmount("Пополнить баланс");
+    if (!amount) {
+      await showMessage("Ошибка", "Введите корректную сумму.");
+      return;
+    }
+    depositFunds(amount);
+    await showMessage("Готово", `Депозит пополнен на ${formatMoney(amount)}.`);
+  };
+
   const user = getTelegramUser();
   const displayName = user
     ? [user.first_name, user.last_name].filter(Boolean).join(" ")
@@ -137,7 +157,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       <div className="toolbar">
-        <button className="icon-button square" aria-label="Справка">
+        <button className="icon-button square" aria-label="Справка" onClick={handleHelp}>
           <InfoIcon size={18} />
         </button>
         <div className="chip">
@@ -148,7 +168,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <span className="chip-icon">₽</span>
           <span>0</span>
           <span className="chip-divider" />
-          <button className="icon-button small" aria-label="Пополнить">
+          <button className="icon-button small" aria-label="Пополнить" onClick={handleQuickDeposit}>
             <PlusIcon size={14} />
           </button>
         </div>
@@ -164,6 +184,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <main className="app-content">{children}</main>
 
       <BottomNav />
+      <ModalHost />
     </div>
   );
 }

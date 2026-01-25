@@ -1,4 +1,6 @@
 import { GiftIcon, SparkleIcon, UsersIcon, WalletIcon } from "../components/icons";
+import { showMessage } from "../lib/notify";
+import { depositFunds, requestAmount } from "../lib/wallet";
 
 const stats = [
   { label: "Призовой фонд", value: "250 000 ₽", hint: "растет каждый день" },
@@ -38,6 +40,30 @@ const upcoming = [
 ] as const;
 
 export default function RafflePage() {
+  const handleTicket = async () => {
+    const amount = await requestAmount("Пополнение для билета");
+    if (!amount) {
+      await showMessage("Ошибка", "Введите корректную сумму.");
+      return;
+    }
+    if (amount < 1000) {
+      await showMessage("Минимум 1 000 ₽", "Пополнение меньше 1 000 ₽ не дает билет.");
+      return;
+    }
+    depositFunds(amount);
+    await showMessage(
+      "Билет получен",
+      "Билет начислен, обновления появятся в вашем профиле."
+    );
+  };
+
+  const handleRules = async () => {
+    await showMessage(
+      "Условия участия",
+      "1) Пополните баланс от 1 000 ₽.\n2) Пригласите друга и получите +2 билета.\n3) Держите депозит активным для увеличения множителя."
+    );
+  };
+
   return (
     <section className="page">
       <div className="section-header reveal">
@@ -55,8 +81,12 @@ export default function RafflePage() {
           Участвуйте в еженедельных розыгрышах и получайте билеты за активность.
         </p>
         <div className="raffle-cta">
-          <button className="btn btn--primary">Получить билет</button>
-          <button className="btn btn--ghost">Условия участия</button>
+          <button className="btn btn--primary" onClick={handleTicket}>
+            Получить билет
+          </button>
+          <button className="btn btn--ghost" onClick={handleRules}>
+            Условия участия
+          </button>
         </div>
         <div className="raffle-countdown">
           <div className="countdown-item">
