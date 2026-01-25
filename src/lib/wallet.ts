@@ -21,6 +21,8 @@ export type TransactionItem = {
 const WALLET_KEY = "investbot.wallet.v1";
 const TX_KEY = "investbot.txs.v1";
 const WALLET_EVENT = "investbot.wallet:update";
+const RATE_KEY = "investbot.usdtRate.v1";
+const RATE_EVENT = "investbot.rate:update";
 
 const defaultWallet: WalletState = {
   balance: 0,
@@ -32,7 +34,8 @@ const defaultWallet: WalletState = {
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const USDT_RATE = 95;
+const DEFAULT_USDT_RATE = 95;
+const RATE_TTL_MS = 5 * 60 * 1000;
 
 const levels = [
   { id: 1, name: "Уровень 1", min: 0, rate: 1.2 },
@@ -58,6 +61,58 @@ const writeJSON = <T,>(key: string, value: T) => {
 
 const emitUpdate = () => {
   window.dispatchEvent(new Event(WALLET_EVENT));
+};
+
+type RateSnapshot = {
+  rate: number;
+  ts: number;
+};
+
+const readRate = () =>
+  readJSON<RateSnapshot>(RATE_KEY, { rate: DEFAULT_USDT_RATE, ts: 0 });
+
+let cachedRate = readRate().rate || DEFAULT_USDT_RATE;
+let cachedRateTs = readRate().ts || 0;
+let ratePromise: Promise<number> | null = null;
+
+const setRate = (rate: number) => {
+  if (!Number.isFinite(rate) || rate <= 0) return;
+  cachedRate = rate;
+  cachedRateTs = Date.now();
+  writeJSON(RATE_KEY, { rate: cachedRate, ts: cachedRateTs });
+  window.dispatchEvent(new Event(RATE_EVENT));
+};
+
+export const getUsdtRate = () =>
+  Number.isFinite(cachedRate) && cachedRate > 0 ? cachedRate : DEFAULT_USDT_RATE;
+
+export const refreshUsdtRate = async (force = false) => {
+  if (typeof window === "undefined") return getUsdtRate();
+  const now = Date.now();
+  if (!force && cachedRateTs && now - cachedRateTs < RATE_TTL_MS) {
+    return getUsdtRate();
+  }
+  if (ratePromise) return ratePromise;
+
+  ratePromise = fetch(
+    "https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=rub"
+  )
+    .then(async (res) => {
+      if (!res.ok) throw new Error("Rate request failed");
+      const data = (await res.json()) as { tether?: { rub?: number } };
+      const rate = data?.tether?.rub;
+      if (typeof rate === "number" && Number.isFinite(rate) && rate > 0) {
+        setRate(rate);
+        return rate;
+      }
+      throw new Error("Invalid rate");
+    })
+    .catch(() => getUsdtRate())
+    .finally(() => {
+      ratePromise = null;
+    });
+
+  return ratePromise;
 };
 
 const normalizeWallet = (wallet: WalletState) => ({
@@ -161,7 +216,11 @@ export const requestAmount = async (title: string, currency: "RUB" | "USDT" = "R
   if (!raw) return null;
   const parsed = parseAmount(raw);
   if (!parsed) return null;
-  return currency === "USDT" ? roundAmount(parsed * USDT_RATE) : parsed;
+  if (currency === "USDT") {
+    const rate = await refreshUsdtRate();
+    return roundAmount(parsed * rate);
+  }
+  return parsed;
 };
 
 export const formatMoney = (value: number) =>
@@ -174,19 +233,20 @@ export const formatMoney = (value: number) =>
 
 export const formatCurrency = (value: number, currency: "RUB" | "USDT") => {
   if (currency === "USDT") {
+    const rate = getUsdtRate();
     return `${new Intl.NumberFormat("ru-RU", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
-    }).format(value / USDT_RATE)} USDT`;
+    }).format(value / rate)} USDT`;
   }
   return formatMoney(value);
 };
 
 export const convertToRub = (value: number, currency: "RUB" | "USDT") =>
-  currency === "USDT" ? roundAmount(value * USDT_RATE) : roundAmount(value);
+  currency === "USDT" ? roundAmount(value * getUsdtRate()) : roundAmount(value);
 
 export const convertFromRub = (value: number, currency: "RUB" | "USDT") =>
-  currency === "USDT" ? roundAmount(value / USDT_RATE) : roundAmount(value);
+  currency === "USDT" ? roundAmount(value / getUsdtRate()) : roundAmount(value);
 
 export const formatNumber = (value: number) =>
   new Intl.NumberFormat("ru-RU", {
@@ -274,6 +334,7 @@ export const collectEarnings = () => {
 export const useWalletState = () => {
   const [wallet, setWallet] = useState<WalletState>(getWallet());
   const [transactions, setTransactions] = useState<TransactionItem[]>(getTransactions());
+  const [usdtRate, setUsdtRate] = useState<number>(getUsdtRate());
 
   useEffect(() => {
     const handle = () => {
@@ -284,6 +345,13 @@ export const useWalletState = () => {
     return () => window.removeEventListener(WALLET_EVENT, handle);
   }, []);
 
+  useEffect(() => {
+    const handleRate = () => setUsdtRate(getUsdtRate());
+    window.addEventListener(RATE_EVENT, handleRate);
+    refreshUsdtRate().then(setUsdtRate);
+    return () => window.removeEventListener(RATE_EVENT, handleRate);
+  }, []);
+
   const metrics = useMemo(() => {
     const total = wallet.invested + wallet.balance;
     const growth = wallet.invested > 0 ? (wallet.balance / wallet.invested) * 100 : 0;
@@ -292,5 +360,5 @@ export const useWalletState = () => {
     return { total, growth, dailyIncome, levelInfo };
   }, [wallet]);
 
-  return { wallet, transactions, metrics };
+  return { wallet, transactions, metrics, usdtRate };
 };
