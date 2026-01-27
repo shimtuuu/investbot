@@ -5,7 +5,7 @@
   max-width: 520px;
   margin: 0 auto;
   padding: calc(16px + env(safe-area-inset-top)) 16px
-    calc(120px + env(safe-area-inset-bottom));
+    calc(200px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -2094,5 +2094,147 @@ html.tg-webapp .bottom-nav {
   .nav-icon {
     width: 32px;
     height: 32px;
+  }
+}
+
+
+/* Footer Styles */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--card-border);
+  padding: 16px;
+  z-index: 10;
+  max-width: 520px;
+  margin: 0 auto;
+  width: 100%;
+  box-shadow: var(--shadow-1);
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-icons-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.footer-icons-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.footer-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.footer-icon svg {
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+}
+
+.footer-icon--bank {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  padding: 4px;
+}
+
+.footer-icon--more {
+  background: rgba(245, 162, 58, 0.16);
+  border-color: rgba(245, 162, 58, 0.35);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.footer-text {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.footer-legal {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.footer-legal p {
+  margin: 0;
+  padding: 0;
+}
+
+.footer-legal p:first-child {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding: 12px;
+  }
+
+  .footer-icons-group {
+    gap: 6px;
+  }
+
+  .footer-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .footer-text {
+    font-size: 0.8rem;
+  }
+
+  .footer-legal {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .footer {
+    padding: 10px;
+  }
+
+  .footer-icons-group {
+    gap: 4px;
+  }
+
+  .footer-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .footer-text {
+    font-size: 0.75rem;
+  }
+
+  .footer-legal {
+    font-size: 0.6rem;
   }
 }

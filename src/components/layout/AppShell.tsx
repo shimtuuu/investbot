@@ -7,6 +7,7 @@ import { getTelegramUser, isTelegramWebApp, prepareWebApp } from "../../lib/tele
 import ModalHost from "../overlays/ModalHost";
 import { InfoIcon, PlusIcon } from "../icons";
 import BottomNav from "../navigation/BottomNav";
+import Footer from "./Footer";
 
 
 export default function AppShell({ children }: { children: ReactNode }) {
@@ -182,6 +183,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <main className="app-content">{children}</main>
 
       <BottomNav />
+      <Footer />
       <ModalHost />
     </div>
   );
