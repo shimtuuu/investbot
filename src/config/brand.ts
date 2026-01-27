@@ -1,5 +1,5 @@
 export const brand = {
-  name: "Orbit Capital",
+  name: "Finora",
   tagline: "Надежная стратегия стабильного дохода",
-  short: "Orbit"
+  short: "Finora"
 };

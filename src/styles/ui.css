@@ -104,7 +104,7 @@ html.tg-webapp .app {
 
 .toolbar {
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 10px;
 }
@@ -202,6 +202,14 @@ html.tg-webapp .app {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.chip--icon {
+  gap: 0;
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+  justify-content: center;
+}
+
 .app-content {
   display: flex;
   flex-direction: column;
@@ -219,6 +227,13 @@ html.tg-webapp .app {
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
+}
+
+.section-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
 }
 
 .section-header h1 {
@@ -252,37 +267,98 @@ html.tg-webapp .app {
   font-weight: 600;
 }
 
-.user-card {
+.trend-grid {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-.user-row {
+.trend-card {
+  border-radius: 18px;
+  padding: 12px;
+  background: rgba(12, 12, 12, 0.9);
+  border: 1px solid rgba(245, 162, 58, 0.2);
+  display: grid;
+  gap: 8px;
+}
+
+.trend-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.user-avatar {
-  width: 52px;
-  height: 52px;
+.trend-logo {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: 2px solid rgba(245, 162, 58, 0.4);
-  background: rgba(245, 162, 58, 0.12);
   display: grid;
   place-items: center;
-  font-weight: 700;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text);
 }
 
-.user-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.trend-logo img {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
+  object-fit: contain;
 }
 
-.user-name {
+.trend-name {
   font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.trend-price {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.trend-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.trend-pill {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.trend-pill--up {
+  background: rgba(43, 214, 123, 0.15);
+  color: var(--success);
+}
+
+.trend-pill--down {
+  background: rgba(255, 91, 107, 0.15);
+  color: var(--danger);
+}
+
+.trend-sparkline {
+  width: 86px;
+  height: 34px;
+}
+
+.trend-sparkline .sparkline-stroke {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trend-sparkline .sparkline-stroke--up {
+  stroke: #39d98a;
+}
+
+.trend-sparkline .sparkline-stroke--down {
+  stroke: #ff5b6b;
 }
 
 .balance-card {
@@ -325,41 +401,43 @@ html.tg-webapp .app {
 
 .tariff-card {
   display: grid;
-  gap: 10px;
+  gap: 6px;
   background: rgba(12, 12, 12, 0.9);
   border-color: rgba(245, 162, 58, 0.16);
+  padding: 12px;
 }
 
 .tariff-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 }
 
 .tariff-name {
   font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .tariff-badge {
-  padding: 4px 8px;
+  padding: 3px 8px;
   border-radius: 999px;
   border: 1px solid rgba(245, 162, 58, 0.35);
   background: rgba(245, 162, 58, 0.16);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
 }
 
 .tariff-meta {
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .tariff-row {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
-  font-size: 0.85rem;
+  gap: 6px;
+  font-size: 0.8rem;
 }
 
 .page--cabinet {
@@ -612,6 +690,17 @@ html.tg-webapp .app {
   gap: 12px;
 }
 
+.calculator-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.calculator-inputs label {
+  display: grid;
+  gap: 6px;
+}
+
 .input-field {
   width: 100%;
   padding: 12px 14px;
@@ -688,9 +777,14 @@ html.tg-webapp .app {
   font-weight: 600;
 }
 .card--hero {
-  min-height: 240px;
+  min-height: 200px;
   background: linear-gradient(135deg, rgba(20, 20, 20, 0.92), rgba(8, 8, 8, 0.7));
   border-color: rgba(245, 162, 58, 0.25);
+}
+
+.hero {
+  touch-action: pan-x;
+  overscroll-behavior: contain;
 }
 
 .hero-content {
@@ -753,27 +847,330 @@ html.tg-webapp .app {
 }
 
 .tabs {
-  display: flex;
-  gap: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(24, 24, 24, 0.92), rgba(10, 10, 10, 0.96));
+  box-shadow:
+    0 16px 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
 }
 
 .tab {
-  padding: 10px 12px 14px;
+  padding: 10px 12px;
   font-weight: 600;
   color: var(--muted);
-  border-bottom: 2px solid transparent;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: 0.2s ease;
 }
 
 .tab--active {
   color: var(--text);
-  border-color: var(--accent);
+  border-color: rgba(245, 162, 58, 0.35);
+  background: radial-gradient(circle at 30% 30%, rgba(245, 162, 58, 0.25), rgba(20, 20, 20, 0.9));
+  box-shadow:
+    inset 0 0 0 1px rgba(245, 162, 58, 0.2),
+    0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
 .list {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.company-tariffs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+.company-card {
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid var(--card-border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 140px;
+  position: relative;
+  overflow: hidden;
+}
+
+.company-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.04), transparent 55%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.company-card--wide {
+  grid-column: span 2;
+  min-height: 120px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.company-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  z-index: 1;
+}
+
+.company-meta {
+  display: grid;
+  gap: 6px;
+  z-index: 1;
+  margin-top: auto;
+}
+
+.company-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  overflow: hidden;
+}
+
+.company-logo img {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.company-name {
+  font-weight: 600;
+}
+
+.company-rate {
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 1.2rem;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.company-range {
+  z-index: 1;
+  font-size: 0.9rem;
+}
+
+.company-card--blue,
+.company-card--gold {
+  border-color: var(--card-border);
+  background: var(--surface);
+}
+
+.company-card--blue .company-logo,
+.company-card--gold .company-logo {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.company-card--blue .company-rate,
+.company-card--gold .company-rate {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.company-card--wide .company-meta {
+  text-align: right;
+  align-items: end;
+  justify-items: end;
+  margin-left: auto;
+  min-width: 210px;
+}
+
+.promo-card {
+  border-radius: 20px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--card-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.promo-body {
+  display: grid;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.promo-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.promo-form {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.promo-input {
+  flex: 1;
+  padding: 12px 16px;
+  min-height: 46px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(10, 10, 10, 0.8);
+  color: var(--text);
+}
+
+.promo-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.promo-submit {
+  padding: 12px 18px;
+  min-height: 46px;
+  min-width: 120px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.promo-illustration {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 110px;
+  height: 110px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.18), transparent 55%),
+    linear-gradient(160deg, rgba(50, 50, 50, 0.9), rgba(20, 20, 20, 0.9));
+  opacity: 0.5;
+  filter: blur(0.2px);
+}
+
+.news-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(18, 18, 18, 0.9);
+}
+
+.news-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: rgba(245, 162, 58, 0.2);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.news-body {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.news-title {
+  font-weight: 600;
+}
+
+.news-pager {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.75rem;
+}
+
+.support-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(70, 70, 70, 0.9), rgba(45, 45, 45, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.support-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.support-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.support-pill {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 80, 100, 0.85);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.support-btn {
+  width: 100%;
+  border-radius: 14px;
+}
+
+.payment-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.payment-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.payment-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.payment-pill--card {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-weight: 600;
+  font-size: 0.85rem;
 }
 
 .list-item {
@@ -1369,6 +1766,11 @@ html.tg-webapp .app {
   z-index: 30;
 }
 
+body.modal-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
 .modal-card {
   width: min(100%, 360px);
   background: linear-gradient(160deg, rgba(28, 28, 28, 0.96), rgba(12, 12, 12, 0.98));
@@ -1421,21 +1823,20 @@ html.tg-webapp .app {
 .bottom-nav {
   position: fixed;
   left: 50%;
-  bottom: 0;
+  bottom: calc(10px + env(safe-area-inset-bottom));
   transform: translateX(-50%);
-  width: min(calc(100% - 24px), 640px);
+  width: min(calc(100% - 48px), 520px);
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 2px;
-  padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
-  font: 600 0.72rem/1.1 var(--font-body);
+  padding: 8px 10px 12px;
+  font: 600 0.68rem/1.1 var(--font-body);
   background: linear-gradient(180deg, rgba(24, 24, 24, 0.92), rgba(10, 10, 10, 0.96));
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.45),
+    0 16px 36px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  width: min(calc(100% - 24px), 640px);
-  border-radius: 999px;
+  border-radius: 30px;
   text-shadow: none;
   z-index: 10;
 }
@@ -1443,22 +1844,26 @@ html.tg-webapp .app {
 html.tg-webapp .bottom-nav {
   left: 50%;
   transform: translateX(-50%);
-  width: min(calc(100% - 24px), 640px);
+  width: min(calc(100% - 48px), 520px);
 }
 
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  font-size: 0.7rem;
+  gap: 5px;
+  font-size: 0.68rem;
   color: var(--muted);
-  padding: 8px 6px;
+  padding: 6px 4px;
+}
+
+.nav-label {
+  line-height: 1.1;
 }
 
 .nav-icon {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -1471,7 +1876,7 @@ html.tg-webapp .bottom-nav {
 
 .nav-item--center {
   margin-top: 0;
-  padding: 8px 4px;
+  padding: 6px 4px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -1509,7 +1914,26 @@ html.tg-webapp .bottom-nav {
     grid-template-columns: 1fr;
   }
 
+  .promo-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .promo-body {
+    padding-right: 0;
+  }
+
+  .promo-illustration {
+    width: 90px;
+    height: 90px;
+    opacity: 0.6;
+  }
+
   .balance-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .calculator-inputs {
     grid-template-columns: 1fr;
   }
 
@@ -1530,5 +1954,145 @@ html.tg-webapp .bottom-nav {
   .wallet-actions,
   .deposit-actions {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 360px) {
+  .app {
+    padding: calc(12px + env(safe-area-inset-top)) 12px
+      calc(108px + env(safe-area-inset-bottom));
+    gap: 14px;
+  }
+
+  .company-tariffs {
+    gap: 10px;
+  }
+
+  .company-card {
+    padding: 12px;
+    min-height: 120px;
+    gap: 10px;
+  }
+
+  .company-card--wide {
+    min-height: 110px;
+  }
+
+  .company-name {
+    font-size: 0.9rem;
+  }
+
+  .company-rate {
+    padding: 6px 10px;
+    font-size: 1rem;
+  }
+
+  .company-range {
+    font-size: 0.8rem;
+  }
+
+  .trend-card {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .trend-logo {
+    width: 30px;
+    height: 30px;
+  }
+
+  .trend-logo img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .trend-name {
+    font-size: 0.85rem;
+  }
+
+  .trend-price {
+    font-size: 0.8rem;
+  }
+
+  .trend-pill {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+  }
+
+  .bottom-nav {
+    width: min(calc(100% - 16px), 560px);
+    padding: 7px 9px 12px;
+    font-size: 0.66rem;
+  }
+
+  .nav-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .balance-actions .btn {
+    padding: 8px;
+    font-size: 0.76rem;
+  }
+
+  .trend-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .trend-logo img {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 320px) {
+  .app {
+    padding: calc(10px + env(safe-area-inset-top)) 10px
+      calc(104px + env(safe-area-inset-bottom));
+  }
+
+  .bottom-nav {
+    width: min(calc(100% - 12px), 520px);
+    gap: 0;
+  }
+
+  .nav-label {
+    font-size: 0.6rem;
+  }
+
+  .nav-icon {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-height: 700px) {
+  .app {
+    gap: 12px;
+  }
+
+  .section-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .card--hero {
+    min-height: 180px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 480px) {
+  .app {
+    padding: calc(10px + env(safe-area-inset-top)) 12px
+      calc(88px + env(safe-area-inset-bottom));
+  }
+
+  .bottom-nav {
+    padding: 5px 8px calc(7px + env(safe-area-inset-bottom));
+  }
+
+  .nav-icon {
+    width: 32px;
+    height: 32px;
   }
 }

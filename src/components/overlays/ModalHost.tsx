@@ -15,6 +15,16 @@ export default function ModalHost() {
     setInputValue(modal.defaultValue ?? "");
   }, [modal?.id]);
 
+  useEffect(() => {
+    const className = "modal-open";
+    if (modal) {
+      document.body.classList.add(className);
+    } else {
+      document.body.classList.remove(className);
+    }
+    return () => document.body.classList.remove(className);
+  }, [modal]);
+
   if (!modal) return null;
 
   const confirmText = modal.confirmText ?? "Ок";

@@ -45,6 +45,23 @@ const levels = [
   { id: 5, name: "Уровень 5", min: 100_000, rate: 2.0 }
 ] as const;
 
+const moneyFormatter = new Intl.NumberFormat("ru-RU", {
+  style: "currency",
+  currency: "RUB",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+
+const usdtFormatter = new Intl.NumberFormat("ru-RU", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+});
+
+const numberFormatter = new Intl.NumberFormat("ru-RU", {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2
+});
+
 const readJSON = <T,>(key: string, fallback: T): T => {
   try {
     const raw = localStorage.getItem(key);
@@ -213,31 +230,23 @@ export const parseAmount = (raw: string) => {
 export const requestAmount = async (title: string, currency: "RUB" | "USDT" = "RUB") => {
   const placeholder = currency === "USDT" ? "100" : "1000";
   const raw = await requestInput(title, "Введите сумму", placeholder);
-  if (!raw) return null;
+  if (!raw) return { value: null, cancelled: true };
   const parsed = parseAmount(raw);
-  if (!parsed) return null;
+  if (!parsed) return { value: null, cancelled: false };
   if (currency === "USDT") {
     const rate = await refreshUsdtRate();
-    return roundAmount(parsed * rate);
+    return { value: roundAmount(parsed * rate), cancelled: false };
   }
-  return parsed;
+  return { value: parsed, cancelled: false };
 };
 
 export const formatMoney = (value: number) =>
-  new Intl.NumberFormat("ru-RU", {
-    style: "currency",
-    currency: "RUB",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(value);
+  moneyFormatter.format(value);
 
 export const formatCurrency = (value: number, currency: "RUB" | "USDT") => {
   if (currency === "USDT") {
     const rate = getUsdtRate();
-    return `${new Intl.NumberFormat("ru-RU", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(value / rate)} USDT`;
+    return `${usdtFormatter.format(value / rate)} USDT`;
   }
   return formatMoney(value);
 };
@@ -249,16 +258,10 @@ export const convertFromRub = (value: number, currency: "RUB" | "USDT") =>
   currency === "USDT" ? roundAmount(value / getUsdtRate()) : roundAmount(value);
 
 export const formatNumber = (value: number) =>
-  new Intl.NumberFormat("ru-RU", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2
-  }).format(value);
+  numberFormatter.format(value);
 
 export const formatPercent = (value: number) =>
-  `${new Intl.NumberFormat("ru-RU", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2
-  }).format(value)}%`;
+  `${numberFormatter.format(value)}%`;
 
 export const depositFunds = (amount: number) => {
   const wallet = getWallet();
@@ -268,6 +271,44 @@ export const depositFunds = (amount: number) => {
   });
   addTransaction("Пополнение", amount, "in");
   return next;
+};
+
+export const topUpBalance = (amount: number) => {
+  const wallet = getWallet();
+  const next = saveWallet({
+    ...wallet,
+    balance: roundAmount(wallet.balance + amount)
+  });
+  addTransaction("Пополнение", amount, "in");
+  return next;
+};
+
+export const transferToDeposit = (amount: number) => {
+  const wallet = getWallet();
+  if (amount > wallet.balance) {
+    return { ok: false, message: "Недостаточно средств на кошельке." } as const;
+  }
+  const next = saveWallet({
+    ...wallet,
+    balance: roundAmount(wallet.balance - amount),
+    invested: roundAmount(wallet.invested + amount)
+  });
+  addTransaction("Перевод в депозит", amount, "out");
+  return { ok: true, wallet: next } as const;
+};
+
+export const transferToBalance = (amount: number) => {
+  const wallet = getWallet();
+  if (amount > wallet.invested) {
+    return { ok: false, message: "Недостаточно средств в депозите." } as const;
+  }
+  const next = saveWallet({
+    ...wallet,
+    invested: roundAmount(wallet.invested - amount),
+    balance: roundAmount(wallet.balance + amount)
+  });
+  addTransaction("Вывод из депозита", amount, "in");
+  return { ok: true, wallet: next } as const;
 };
 
 export const withdrawFunds = (amount: number) => {

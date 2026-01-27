@@ -1,14 +1,13 @@
 import { type ReactNode, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { brand } from "../../config/brand";
-import { links } from "../../config/links";
-import { openExternal, showConfirm, showMessage } from "../../lib/notify";
-import { depositFunds, formatMoney, requestAmount } from "../../lib/wallet";
+import { showMessage } from "../../lib/notify";
+import { formatMoney, requestAmount, topUpBalance, useWalletState } from "../../lib/wallet";
 import { getTelegramUser, isTelegramWebApp, prepareWebApp } from "../../lib/telegram";
 import ModalHost from "../overlays/ModalHost";
 import { InfoIcon, PlusIcon } from "../icons";
 import BottomNav from "../navigation/BottomNav";
 
-const currency = "RUB";
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const getAllowWebFromEnv = () => {
@@ -123,20 +122,25 @@ export default function AppShell({ children }: { children: ReactNode }) {
     );
   }
 
-  const handleHelp = async () => {
-    await showConfirm("Справка", "Открыть поддержку в Telegram?", () =>
-      openExternal(links.bot)
-    );
+  const navigate = useNavigate();
+
+  const handleHelp = () => {
+    navigate("/info");
   };
 
+  const { wallet } = useWalletState();
+
   const handleQuickDeposit = async () => {
-    const amount = await requestAmount("Пополнить баланс");
+    const { value: amount, cancelled } = await requestAmount("Пополнить баланс");
+    if (cancelled) {
+      return;
+    }
     if (!amount) {
       await showMessage("Ошибка", "Введите корректную сумму.");
       return;
     }
-    depositFunds(amount);
-    await showMessage("Готово", `Депозит пополнен на ${formatMoney(amount)}.`);
+    const next = topUpBalance(amount);
+    await showMessage("Готово", `Баланс пополнен. Доступно: ${formatMoney(next.balance)}.`);
   };
 
   const user = getTelegramUser();
@@ -148,10 +152,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
     <div className="app">
       <header className="topbar topbar--center">
         <div className="brand-chip">
-          <div className="brand-avatar" aria-hidden="true" />
           <div>
             <div className="brand-name">{brand.name}</div>
-            <div className="brand-sub">{displayName}</div>
           </div>
         </div>
       </header>
@@ -160,13 +162,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <button className="icon-button square" aria-label="Справка" onClick={handleHelp}>
           <InfoIcon size={18} />
         </button>
-        <div className="chip">
-          <span className="chip-icon">₽</span>
-          <span>{currency}</span>
-        </div>
         <div className="chip chip--action">
           <span className="chip-icon">₽</span>
-          <span>0</span>
+          <span>{formatMoney(wallet.balance)}</span>
           <span className="chip-divider" />
           <button className="icon-button small" aria-label="Пополнить" onClick={handleQuickDeposit}>
             <PlusIcon size={14} />

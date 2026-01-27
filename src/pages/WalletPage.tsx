@@ -1,6 +1,17 @@
-import { CalculatorIcon } from "../components/icons";
-import { requestInput, showMessage } from "../lib/notify";
-import { depositFunds, formatMoney, requestAmount, useWalletState, withdrawFunds } from "../lib/wallet";
+import { useMemo, useState } from "react";
+import { showMessage } from "../lib/notify";
+import {
+  convertToRub,
+  formatCurrency,
+  formatMoney,
+  formatNumber,
+  formatPercent,
+  parseAmount,
+  requestAmount,
+  topUpBalance,
+  useWalletState,
+  withdrawFunds
+} from "../lib/wallet";
 
 const paymentMethods = [
   { label: "Pay", bg: "rgba(60, 211, 107, 0.18)", border: "rgba(60, 211, 107, 0.5)" },
@@ -12,20 +23,64 @@ const paymentMethods = [
 ] as const;
 
 export default function WalletPage() {
-  const { wallet } = useWalletState();
+  const { wallet, metrics, usdtRate } = useWalletState();
+  const [calcCurrency, setCalcCurrency] = useState<"RUB" | "USDT">("RUB");
+  const [calcAmountRaw, setCalcAmountRaw] = useState("1000");
+  const [calcDaysRaw, setCalcDaysRaw] = useState("30");
+  const [calcCompound, setCalcCompound] = useState(false);
+
+  const calcAmount = parseAmount(calcAmountRaw) ?? 0;
+  const calcDays = Number(calcDaysRaw.replace(/[^\d]/g, "")) || 0;
+  const dailyRate = metrics.levelInfo.current.rate;
+
+  const calcResult = useMemo(() => {
+    const principalRub = convertToRub(calcAmount, calcCurrency);
+    if (!principalRub || calcDays <= 0 || dailyRate <= 0) {
+      return {
+        dailyRub: 0,
+        profitRub: 0,
+        finalRub: 0
+      };
+    }
+    const dailyRub = (principalRub * dailyRate) / 100;
+    if (calcCompound) {
+      const finalRub = principalRub * Math.pow(1 + dailyRate / 100, calcDays);
+      return {
+        dailyRub,
+        profitRub: finalRub - principalRub,
+        finalRub
+      };
+    }
+    const profitRub = dailyRub * calcDays;
+    return {
+      dailyRub,
+      profitRub,
+      finalRub: principalRub + profitRub
+    };
+  }, [calcAmount, calcCurrency, calcDays, calcCompound, dailyRate]);
 
   const handleDeposit = async () => {
-    const amount = await requestAmount("Сумма пополнения");
+    const { value: amount, cancelled } = await requestAmount("Сумма пополнения");
+    if (cancelled) {
+      return;
+    }
     if (!amount) {
       await showMessage("Ошибка", "Введите корректную сумму.");
       return;
     }
-    depositFunds(amount);
-    await showMessage("Готово", `Депозит пополнен на ${formatMoney(amount)}.`);
+    const next = topUpBalance(amount);
+    await showMessage("Готово", `Депозит пополнен. Баланс: ${formatMoney(next.balance)}.`);
   };
 
   const handleWithdraw = async () => {
-    const amount = await requestAmount("Сумма вывода");
+    if (wallet.balance <= 0) {
+      await showMessage("Ошибка", "Недостаточно средств для вывода.");
+      return;
+    }
+    const { value: amount, cancelled } = await requestAmount("Сумма вывода");
+    if (cancelled) {
+      return;
+    }
     if (!amount) {
       await showMessage("Ошибка", "Введите корректную сумму.");
       return;
@@ -35,29 +90,7 @@ export default function WalletPage() {
       await showMessage("Ошибка", result.message);
       return;
     }
-    await showMessage("Готово", `Заявка на вывод ${formatMoney(amount)} создана.`);
-  };
-
-  const handleCalculator = async () => {
-    const principal = await requestAmount("Сумма для расчета");
-    if (!principal) {
-      await showMessage("Ошибка", "Введите корректную сумму.");
-      return;
-    }
-    const daysRaw = await requestInput("Срок", "Введите срок в днях", "30");
-    const days = daysRaw ? Number(daysRaw.replace(/[^\d]/g, "")) : 0;
-    if (!Number.isFinite(days) || days <= 0) {
-      await showMessage("Ошибка", "Введите корректное количество дней.");
-      return;
-    }
-    const dailyRate = 0.018;
-    const profit = principal * dailyRate * days;
-    await showMessage(
-      "Расчет дохода",
-      `Сумма: ${formatMoney(principal)}\nСрок: ${days} дн.\nОжидаемая прибыль: ${formatMoney(
-        profit
-      )}`
-    );
+    await showMessage("Готово", `Заявка на вывод создана. Баланс: ${formatMoney(result.wallet.balance)}.`);
   };
 
   return (
@@ -83,9 +116,8 @@ export default function WalletPage() {
         </div>
       </div>
 
-      <div className="section-header reveal" style={{ animationDelay: "140ms" }}>
+      <div className="section-header reveal" style={{ animationDelay: "120ms" }}>
         <h2>Платежные решения</h2>
-        <span className="muted">Подключим за 10 минут</span>
       </div>
 
       <div className="payments reveal" style={{ animationDelay: "180ms" }}>
@@ -96,17 +128,90 @@ export default function WalletPage() {
         ))}
       </div>
 
-      <div className="card calculator-card reveal" style={{ animationDelay: "220ms" }}>
-        <div className="calculator-icon">
-          <CalculatorIcon size={20} />
+      <div className="section-header reveal" style={{ animationDelay: "220ms" }}>
+        <h2>Калькулятор</h2>
+        <span className="muted">Расширенный расчет</span>
+      </div>
+
+      <div className="card calculator-panel reveal" style={{ animationDelay: "260ms" }}>
+        <div className="calculator-row">
+          <div>
+            <div className="card-title">Параметры</div>
+            <div className="muted">Выберите сумму и срок</div>
+          </div>
+          <div className="currency-toggle">
+            <button
+              className={`currency-chip ${calcCurrency === "RUB" ? "is-active" : ""}`}
+              onClick={() => setCalcCurrency("RUB")}
+            >
+              ₽
+            </button>
+            <button
+              className={`currency-chip ${calcCurrency === "USDT" ? "is-active" : ""}`}
+              onClick={() => setCalcCurrency("USDT")}
+            >
+              USDT
+            </button>
+          </div>
         </div>
-        <div>
-          <div className="card-title">Калькулятор</div>
-          <div className="muted">Рассчитайте доход по тарифам</div>
+
+        <div className="calculator-inputs">
+          <label>
+            <div className="muted">Сумма</div>
+            <input
+              className="input-field"
+              value={calcAmountRaw}
+              onChange={(event) => setCalcAmountRaw(event.target.value)}
+              inputMode="decimal"
+            />
+          </label>
+          <label>
+            <div className="muted">Срок (дней)</div>
+            <input
+              className="input-field"
+              value={calcDaysRaw}
+              onChange={(event) => setCalcDaysRaw(event.target.value)}
+              inputMode="numeric"
+            />
+          </label>
         </div>
-        <button className="btn btn--ghost" onClick={handleCalculator}>
-          Открыть
-        </button>
+
+        <div className="calculator-grid">
+          <div>
+            <div className="muted">Доходность</div>
+            <div className="calc-value">{formatPercent(dailyRate)} в день</div>
+          </div>
+          <div>
+            <div className="muted">Курс USDT</div>
+            <div className="calc-value">{formatNumber(usdtRate)} ₽</div>
+          </div>
+        </div>
+
+        <div className="action-toggle">
+          <span className="muted">Реинвестировать ежедневно</span>
+          <button
+            className={`toggle ${calcCompound ? "toggle--on" : ""}`}
+            onClick={() => setCalcCompound((prev) => !prev)}
+            type="button"
+          >
+            <span className="toggle-thumb" />
+          </button>
+        </div>
+
+        <div className="calc-list">
+          <div className="calc-row">
+            <span className="muted">Доход в день</span>
+            <strong>{formatCurrency(calcResult.dailyRub, calcCurrency)}</strong>
+          </div>
+          <div className="calc-row">
+            <span className="muted">Доход за период</span>
+            <strong>{formatCurrency(calcResult.profitRub, calcCurrency)}</strong>
+          </div>
+          <div className="calc-row">
+            <span className="muted">Итоговая сумма</span>
+            <strong>{formatCurrency(calcResult.finalRub, calcCurrency)}</strong>
+          </div>
+        </div>
       </div>
     </section>
   );

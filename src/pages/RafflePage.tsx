@@ -41,7 +41,10 @@ const upcoming = [
 
 export default function RafflePage() {
   const handleTicket = async () => {
-    const amount = await requestAmount("Пополнение для билета");
+    const { value: amount, cancelled } = await requestAmount("Пополнение для билета");
+    if (cancelled) {
+      return;
+    }
     if (!amount) {
       await showMessage("Ошибка", "Введите корректную сумму.");
       return;
@@ -76,7 +79,7 @@ export default function RafflePage() {
           <GiftIcon size={16} />
           Большой розыгрыш
         </div>
-        <h2 className="raffle-title">Orbit Winter Cup</h2>
+        <h2 className="raffle-title">Finora Winter Cup</h2>
         <p className="raffle-sub">
           Участвуйте в еженедельных розыгрышах и получайте билеты за активность.
         </p>
