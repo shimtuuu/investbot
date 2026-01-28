@@ -9,6 +9,66 @@ import { InfoIcon, PlusIcon } from "../icons";
 import BottomNav from "../navigation/BottomNav";
 import Footer from "./Footer";
 
+function AppHeader() {
+  const navigate = useNavigate();
+  const { wallet } = useWalletState();
+
+  const handleHelp = () => {
+    navigate("/info");
+  };
+
+  const handleQuickDeposit = async () => {
+    const { value: amount, cancelled } = await requestAmount("Пополнить баланс");
+    if (cancelled) {
+      return;
+    }
+    if (!amount) {
+      await showMessage("Ошибка", "Введите корректную сумму.");
+      return;
+    }
+    const next = topUpBalance(amount);
+    await showMessage("Готово", `Баланс пополнен. Доступно: ${formatMoney(next.balance)}.`);
+  };
+
+  const user = getTelegramUser();
+  const displayName = user
+    ? [user.first_name, user.last_name].filter(Boolean).join(" ")
+    : "Гость";
+
+  return (
+    <>
+      <header className="topbar topbar--center">
+        <div className="brand-chip">
+          <div>
+            <div className="brand-name">{brand.name}</div>
+          </div>
+        </div>
+      </header>
+
+      <div className="toolbar">
+        <button className="icon-button square" aria-label="Справка" onClick={handleHelp}>
+          <InfoIcon size={18} />
+        </button>
+        <div className="chip chip--action">
+          <span className="chip-icon">₽</span>
+          <span>{formatMoney(wallet.balance)}</span>
+          <span className="chip-divider" />
+          <button className="icon-button small" aria-label="Пополнить" onClick={handleQuickDeposit}>
+            <PlusIcon size={14} />
+          </button>
+        </div>
+        <div className="avatar" aria-label={displayName}>
+          {user?.photo_url ? (
+            <img src={user.photo_url} alt={displayName} />
+          ) : (
+            <span>{displayName.slice(0, 1)}</span>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const getAllowWebFromEnv = () => {
@@ -123,67 +183,16 @@ export default function AppShell({ children }: { children: ReactNode }) {
     );
   }
 
-  const navigate = useNavigate();
-
-  const handleHelp = () => {
-    navigate("/info");
-  };
-
-  const { wallet } = useWalletState();
-
-  const handleQuickDeposit = async () => {
-    const { value: amount, cancelled } = await requestAmount("Пополнить баланс");
-    if (cancelled) {
-      return;
-    }
-    if (!amount) {
-      await showMessage("Ошибка", "Введите корректную сумму.");
-      return;
-    }
-    const next = topUpBalance(amount);
-    await showMessage("Готово", `Баланс пополнен. Доступно: ${formatMoney(next.balance)}.`);
-  };
-
-  const user = getTelegramUser();
-  const displayName = user
-    ? [user.first_name, user.last_name].filter(Boolean).join(" ")
-    : "Гость";
-
   return (
     <div className="app">
-      <header className="topbar topbar--center">
-        <div className="brand-chip">
-          <div>
-            <div className="brand-name">{brand.name}</div>
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
-      <div className="toolbar">
-        <button className="icon-button square" aria-label="Справка" onClick={handleHelp}>
-          <InfoIcon size={18} />
-        </button>
-        <div className="chip chip--action">
-          <span className="chip-icon">₽</span>
-          <span>{formatMoney(wallet.balance)}</span>
-          <span className="chip-divider" />
-          <button className="icon-button small" aria-label="Пополнить" onClick={handleQuickDeposit}>
-            <PlusIcon size={14} />
-          </button>
-        </div>
-        <div className="avatar" aria-label={displayName}>
-          {user?.photo_url ? (
-            <img src={user.photo_url} alt={displayName} />
-          ) : (
-            <span>{displayName.slice(0, 1)}</span>
-          )}
-        </div>
-      </div>
-
-      <main className="app-content">{children}</main>
+      <main className="app-content">
+        {children}
+        <Footer />
+      </main>
 
       <BottomNav />
-      <Footer />
       <ModalHost />
     </div>
   );

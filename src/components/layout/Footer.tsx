@@ -23,29 +23,32 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-content">
         <div className="footer-icons-section">
-          <div className="footer-icons-group">
-            {cryptos.map((crypto) => (
-              <div
-                key={crypto.alt}
-                className="footer-icon"
-                title={crypto.alt}
-                dangerouslySetInnerHTML={{ __html: crypto.svg }}
-              />
-            ))}
-            <div className="footer-icon footer-icon--more">+5</div>
+          <div className="footer-row footer-row--crypto">
+            <div className="footer-icons-row">
+              {cryptos.map((crypto) => (
+                <div
+                  key={crypto.alt}
+                  className="footer-icon"
+                  title={crypto.alt}
+                  dangerouslySetInnerHTML={{ __html: crypto.svg }}
+                />
+              ))}
+              <div className="footer-icon footer-icon--more">+5</div>
+            </div>
           </div>
 
-          <div className="footer-text">Переводы на карту</div>
-
-          <div className="footer-icons-group">
-            {banks.map((bank) => (
-              <img
-                key={bank.alt}
-                src={bank.src}
-                alt={bank.alt}
-                className="footer-icon footer-icon--bank"
-              />
-            ))}
+          <div className="footer-row footer-row--banks">
+            <div className="footer-icons-row">
+              {banks.map((bank) => (
+                <img
+                  key={bank.alt}
+                  src={bank.src}
+                  alt={bank.alt}
+                  className="footer-icon footer-icon--bank"
+                />
+              ))}
+            </div>
+            <span className="footer-pill">Переводы на карту</span>
           </div>
         </div>
 

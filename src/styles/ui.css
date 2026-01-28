@@ -4,11 +4,12 @@
   width: 100%;
   max-width: 520px;
   margin: 0 auto;
-  padding: calc(16px + env(safe-area-inset-top)) 16px
-    calc(200px + env(safe-area-inset-bottom));
+  padding: calc(clamp(10px, 2.6vw, 16px) + env(safe-area-inset-top))
+    clamp(10px, 3.2vw, 16px)
+    calc(clamp(96px, 18vw, 120px) + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: clamp(12px, 2.4vw, 18px);
   position: relative;
   z-index: 1;
 }
@@ -213,13 +214,13 @@ html.tg-webapp .app {
 .app-content {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: clamp(12px, 2.4vw, 18px);
 }
 
 .page {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: clamp(12px, 2.4vw, 18px);
 }
 
 .section-header {
@@ -227,6 +228,7 @@ html.tg-webapp .app {
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .section-title {
@@ -248,7 +250,7 @@ html.tg-webapp .app {
   background: var(--surface);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  padding: 18px;
+  padding: clamp(14px, 3vw, 18px);
   box-shadow: var(--shadow-1);
   position: relative;
   overflow: hidden;
@@ -441,7 +443,7 @@ html.tg-webapp .app {
 }
 
 .page--cabinet {
-  padding-bottom: 140px;
+  padding-bottom: 0;
 }
 
 .profile-card {
@@ -564,8 +566,7 @@ html.tg-webapp .app {
 }
 
 .action-bar {
-  position: sticky;
-  bottom: calc(92px + env(safe-area-inset-bottom));
+  position: static;
   display: grid;
   gap: 10px;
   padding: 12px;
@@ -777,7 +778,7 @@ html.tg-webapp .app {
   font-weight: 600;
 }
 .card--hero {
-  min-height: 200px;
+  min-height: 165px;
   background: linear-gradient(135deg, rgba(20, 20, 20, 0.92), rgba(8, 8, 8, 0.7));
   border-color: rgba(245, 162, 58, 0.25);
 }
@@ -894,13 +895,14 @@ html.tg-webapp .app {
 
 .company-card {
   border-radius: 18px;
-  padding: 16px;
+  padding: clamp(12px, 3vw, 16px);
   border: 1px solid var(--card-border);
   background: var(--surface);
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 140px;
+  min-height: clamp(120px, 26vw, 140px);
+  min-width: 0;
   position: relative;
   overflow: hidden;
 }
@@ -916,10 +918,10 @@ html.tg-webapp .app {
 
 .company-card--wide {
   grid-column: span 2;
-  min-height: 120px;
+  min-height: clamp(110px, 24vw, 120px);
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
 }
 
@@ -930,11 +932,16 @@ html.tg-webapp .app {
   z-index: 1;
 }
 
+.company-card-head > div {
+  min-width: 0;
+}
+
 .company-meta {
   display: grid;
   gap: 6px;
   z-index: 1;
   margin-top: auto;
+  width: 100%;
 }
 
 .company-logo {
@@ -971,6 +978,10 @@ html.tg-webapp .app {
   width: fit-content;
 }
 
+.company-card:not(.company-card--wide) .company-rate {
+  margin-left: auto;
+}
+
 .company-range {
   z-index: 1;
   font-size: 0.9rem;
@@ -998,6 +1009,11 @@ html.tg-webapp .app {
   justify-items: end;
   margin-left: auto;
   min-width: 210px;
+  align-self: flex-end;
+}
+
+.company-card--wide .company-range {
+  text-align: right;
 }
 
 .promo-card {
@@ -1178,7 +1194,7 @@ html.tg-webapp .app {
   grid-template-columns: auto 1fr auto;
   gap: 12px;
   align-items: center;
-  padding: 14px 16px;
+  padding: clamp(10px, 2.8vw, 16px);
   border-radius: var(--radius-md);
   background: rgba(16, 16, 16, 0.9);
   border: 1px solid rgba(245, 162, 58, 0.12);
@@ -1766,6 +1782,18 @@ html.tg-webapp .app {
   z-index: 30;
 }
 
+.low-perf .action-bar,
+.low-perf .tabs,
+.low-perf .modal-backdrop {
+  backdrop-filter: none;
+}
+
+.low-perf .bottom-nav,
+.low-perf .card,
+.low-perf .hero-glow {
+  box-shadow: var(--shadow-glass-soft);
+}
+
 body.modal-open {
   overflow: hidden;
   touch-action: none;
@@ -1978,6 +2006,48 @@ html.tg-webapp .bottom-nav {
     min-height: 110px;
   }
 
+  .company-card,
+  .company-card--wide {
+    align-items: stretch;
+  }
+
+  .company-meta {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .company-rate {
+    align-self: flex-end;
+  }
+
+  .company-range {
+    text-align: right;
+  }
+
+  .list-item {
+    gap: 10px;
+  }
+
+  .section-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .section-header h2 {
+    font-size: 1rem;
+  }
+
+  .hero-label {
+    font-size: 0.65rem;
+  }
+
+  .hero-title {
+    font-size: clamp(1.2rem, 4vw, 1.6rem);
+  }
+
+  .hero-sub {
+    font-size: 0.9rem;
+  }
+
   .company-name {
     font-size: 0.9rem;
   }
@@ -2100,50 +2170,51 @@ html.tg-webapp .bottom-nav {
 
 /* Footer Styles */
 .footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--card-border);
-  padding: 16px;
-  z-index: 10;
-  max-width: 520px;
-  margin: 0 auto;
+  background: transparent;
+  border-top: 0;
+  padding: 8px 0 0;
   width: 100%;
-  box-shadow: var(--shadow-1);
+  box-shadow: none;
 }
 
 .footer-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 .footer-icons-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  align-items: center;
+  gap: 8px;
+  align-items: flex-start;
 }
 
-.footer-icons-group {
+.footer-icons-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
 }
 
+.footer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
 .footer-icon {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -2155,10 +2226,10 @@ html.tg-webapp .bottom-nav {
 }
 
 .footer-icon--bank {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
-  padding: 4px;
+  padding: 3px;
 }
 
 .footer-icon--more {
@@ -2169,16 +2240,20 @@ html.tg-webapp .bottom-nav {
   font-weight: 600;
 }
 
-.footer-text {
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.85rem;
-  font-weight: 500;
+.footer-pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text);
+  white-space: nowrap;
 }
 
 .footer-legal {
-  text-align: center;
-  font-size: 0.7rem;
+  text-align: left;
+  font-size: 0.68rem;
   color: var(--muted);
   line-height: 1.4;
 }
@@ -2195,46 +2270,40 @@ html.tg-webapp .bottom-nav {
 
 @media (max-width: 480px) {
   .footer {
-    padding: 12px;
-  }
-
-  .footer-icons-group {
-    gap: 6px;
+    padding: 6px 0 0;
   }
 
   .footer-icon {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
   }
 
-  .footer-text {
-    font-size: 0.8rem;
+  .footer-pill {
+    font-size: 0.74rem;
+    padding: 5px 9px;
   }
 
   .footer-legal {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
   }
 }
 
 @media (max-width: 320px) {
   .footer {
-    padding: 10px;
-  }
-
-  .footer-icons-group {
-    gap: 4px;
+    padding: 6px 0 0;
   }
 
   .footer-icon {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
   }
 
-  .footer-text {
-    font-size: 0.75rem;
+  .footer-pill {
+    font-size: 0.68rem;
+    padding: 4px 8px;
   }
 
   .footer-legal {
-    font-size: 0.6rem;
+    font-size: 0.58rem;
   }
 }
